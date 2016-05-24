@@ -18,3 +18,7 @@ Route::get('/', function () {
 Route::auth();
 
 Route::get('/home', 'HomeController@index');
+
+Route::post('/event/{id}/signup', 'EventController@signup');
+Route::get('/event/{id}/cancel', 'EventController@cancel');
+Route::resource('/event', 'EventController');
