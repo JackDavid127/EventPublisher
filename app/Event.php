@@ -8,7 +8,7 @@ class Event extends Model
 {
     public $primaryKey = 'event_id';
     public $timestamps = false;
-    public function getUser(){
-        return $this->belongsToMany("App\Event", 'user_event', 'event_id', 'event_id')->get();
+    public function users(){
+        return $this->belongsToMany("App\User", 'user_event', 'event_id', 'user_id');
     }
 }

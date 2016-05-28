@@ -22,3 +22,6 @@ Route::get('/home', 'HomeController@index');
 Route::post('/event/{id}/signup', 'EventController@signup');
 Route::get('/event/{id}/cancel', 'EventController@cancel');
 Route::resource('/event', 'EventController');
+Route::resource('/user', 'UserController');
+Route::resource('/message', 'MessageController');
+Route::get('/tag/{id}','TagController@show');

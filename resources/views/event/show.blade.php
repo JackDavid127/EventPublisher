@@ -10,8 +10,14 @@
                 </div>
 
                 <div class="panel-body">
-                    <h3><?php echo $event->event_title; ?></h3>
+                    <h3>{{ $event->event_title }}</h3>
+                    <p>标签：
+                        @foreach ($tags as $tag)
+                        <a href="/tag/{{ $tag }}"><span class="label label-success">#{{ $tag }}</span></a>
+                        @endforeach
+                    </p>
                     <dl class="dl-horizontal">
+                        <dt>发起人</dt><dd><a href="/user/{{ $user->id }}">{{ $user->name }}</a></dd>
                         <dt>活动地点</dt><dd><?php echo $event->event_place; ?></dd>
                         <dt>活动开始时间</dt><dd><?php echo $event->event_start; ?></dd>
                         <dt>活动结束时间</dt><dd><?php echo $event->event_end; ?></dd>
@@ -22,11 +28,33 @@
                     <p><?php echo $event->event_content; ?></p>
                     <h4 class="page-header">活动要求</h4>
                     <p><?php echo $event->event_limit; ?></p>
+                    <h4 class="page-header">已参与的用户</h4>
                     @if ($isadmin == true)
-                        <a class="btn btn-success" href="/event/<?php echo $event->event_id; ?>/edit" role="button">编辑活动</a>
+                    <table class="table table-striped table-bordered table-hover">
+                        <tr><td>Id</td><td>昵称</td><td>真实姓名</td><td>手机号码</td><td>电子邮箱地址</td></tr>
+                        @foreach ($users as $user)
+                            <tr>
+                                <td>{{ $user->id }}</td>
+                                <td><a href='/user/{{ $user->id }}'>{{ $user->name }}</a></td>
+                                <td>{{ $user->truename }}</td>
+                                <td>{{ $user->phone }}</td>
+                                <td>{{ $user->email }}</td>
+                            </tr>
+                        @endforeach
+                    </table>
+                    @else
+                    <h3>
+                        @foreach ($users as $user)
+                            <a href="/user/{{ $user->id }}"><span class="label label-primary">{{ $user->name }}</span></a>
+                        @endforeach
+                    </h3>
+                    @endif
+                    <br /><br />
+                    @if ($isadmin == true)
                         <form action="/event/<?php echo $event->event_id; ?>" method="POST">
                             <input type="hidden" name="_method" value="DELETE" />
                             <input type="hidden" name="_token" value="{{ csrf_token() }}" />
+                            <a class="btn btn-success" href="/event/<?php echo $event->event_id; ?>/edit" role="button">编辑活动</a>
                             <button type="submit" class="btn btn-danger">删除活动</button>
                         </form>
                     @elseif ($isin == true)
@@ -47,7 +75,8 @@
                             </div>
                         </form>
                     @else
-                        <a class="btn btn-danger disabled" href="#" role="button">参加活动</a>
+                        <p>该活动已截止报名或没有报名名额。</p>
+                        <a class="btn btn-success disabled" href="#" role="button">参加活动</a>
                     @endif
                 </div>
             </div>

@@ -7,7 +7,7 @@ use Illuminate\Http\Request;
 use App\Http\Requests;
 
 use App\Event;
-
+use App\User;
 use Auth;
 use DB;
 
@@ -63,6 +63,10 @@ class EventController extends Controller
         $event->event_total=$request->input("event_total");
         $event->event_place=$request->input("event_place");
         $event->save();
+        $tags = explode(" ", $request->input("event_tags"));
+        foreach ($tags as $tag){
+            DB::table('event_tag')->insert(['event_id' => $event->event_id, 'tag_name' => $tag]);
+        }
         return view('event.store');
     }
 
@@ -74,22 +78,23 @@ class EventController extends Controller
      */
     public function show($id)
     {
-        $event=Event::find($id);
-        $userid=Auth::user()->id;
+        $event = Event::find($id);
+        $tags = DB::table('event_tag')->where('event_id', $event->event_id)->lists('tag_name');
+        $userid = Auth::user()->id;
+        $auser = User::find($event->event_user_id);
+        $userlist = $event->users()->get();
         if ($event->event_user_id == $userid){
             $isadmin = true;
             $isin = false;
             $isok = true;
         }
         else{
-            $userlist = DB::table('user_event')->where('event_id', $id)->lists('user_id');
-            $isadmin = false; $isok = true;
-            if ($userlist == null) $isin = false;
-            elseif (in_array($userid,$userlist)) $isin = true;
-            elseif ($event->event_total == 0) {$isok = false; $isin = false;}
-            else $isin = false;
+            $isadmin = false; $isok = true; $isin = false;
+            foreach ($userlist as $user)
+                if ($user->id == $userid) {$isin = true; break;}
+            if ($event->event_total == 0) $isok = false;
         }
-        return view('event.show',['event' => $event, 'isadmin' => $isadmin, 'isin' => $isin, 'isok' => $isok]);
+        return view('event.show',['event' => $event, 'isadmin' => $isadmin, 'isin' => $isin, 'isok' => $isok, 'users' => $userlist, 'tags' => $tags, 'user' => $auser]);
     }
 
     /**
@@ -101,7 +106,9 @@ class EventController extends Controller
     public function edit($id)
     {
         $event=Event::find($id);
-        return view('event.edit',['event' => $event]);
+        $tags = DB::table('event_tag')->where('event_id', $event->event_id)->lists('tag_name');
+        $str = implode(' ', $tags);
+        return view('event.edit',['event' => $event, 'tagsval' => $str]);
     }
 
     /**
@@ -124,6 +131,16 @@ class EventController extends Controller
         $event->event_total=$request->input("event_total");
         $event->event_place=$request->input("event_place");
         $event->save();
+        $tags = explode(" ", $request->input("event_tags"));
+        $oldtags = DB::table('event_tag')->where('event_id', $event->event_id)->lists('tag_name');
+        $newtags = array_diff($tags, $oldtags);
+        $deltags = array_diff($oldtags, $tags);
+        foreach ($deltags as $tag){
+            DB::table('event_tag')->where('tag_name', $tag)->delete();
+        }
+        foreach ($newtags as $tag){
+            DB::table('event_tag')->insert(['event_id' => $event->event_id, 'tag_name' => $tag]);
+        }
         return view('event.update');
     }
 
@@ -144,10 +161,11 @@ class EventController extends Controller
         $userid=Auth::user()->id;
         $msg=$request->input("message");
         DB::transaction(function () use($userid, $id, $msg){
-            DB::insert("insert into user_event (user_id, event_id, message) values(?, ?, ?)",[$userid, $id, $msg]);
             $event=Event::find($id);
+            if($event->event_total == 0) return;
             $event->event_total--;
             $event->save();
+            DB::insert("insert into user_event (user_id, event_id, message) values(?, ?, ?)",[$userid, $id, $msg]);
         });
         return redirect()->action('EventController@show',[$id]);
     }

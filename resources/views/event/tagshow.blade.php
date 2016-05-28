@@ -9,9 +9,8 @@
                     活动列表
                     <a class="btn btn-success" href="{{ url('/event/create')}}" role="button">添加活动</a>
                 </div>
-
                 <div class="panel-body">
-                    <h3 class="page-header">所有活动</h3>
+                    <h3 class="page-header">#{{ $tag }}下的活动</h3>
                     <table class="table table-bordered table-hover table-striped">
                         <tr><td>Id</td><td>活动标题</td><td>活动报名截止时间</td></tr>
                         <?php

@@ -17,6 +17,12 @@
                             </div>
                         </div>
                         <div class="form-group">
+                            <label for="event_tags" class="col-sm-2 control-label">活动分类标签</label>
+                            <div class="col-sm-10">
+                                <input required type="text" class="form-control" id="event_tags" name="event_tags" placeholder="请将不同标签用空格隔开"/>
+                            </div>
+                        </div>
+                        <div class="form-group">
                             <label for="event_content" class="col-sm-2 control-label">活动介绍</label>
                             <div class="col-sm-10">
                                 <textarea required class="form-control" rows="5" id="event_content" name="event_content"></textarea>
