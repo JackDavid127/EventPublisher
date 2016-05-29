@@ -11,6 +11,14 @@
                 </div>
                 <div class="panel-body">
                     <h3 class="page-header">#{{ $tag }}下的活动</h3>
+                    <form action="/tag/{{ $tag }}" method="POST">
+                        <input type="hidden" name="_token" value="{{ csrf_token() }}" />
+                        @if ($isin == true)
+                        <button type="submit" class="btn btn-danger">取消关注</button>
+                        @else
+                        <button type="submit" class="btn btn-success">关注该标签</button>
+                        @endif
+                    </form><br />
                     <table class="table table-bordered table-hover table-striped">
                         <tr><td>Id</td><td>活动标题</td><td>活动报名截止时间</td></tr>
                         <?php

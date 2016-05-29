@@ -11,9 +11,7 @@
 |
 */
 
-Route::get('/', function () {
-    return view('welcome');
-});
+Route::get('/', 'TagController@index');
 
 Route::auth();
 
@@ -25,3 +23,4 @@ Route::resource('/event', 'EventController');
 Route::resource('/user', 'UserController');
 Route::resource('/message', 'MessageController');
 Route::get('/tag/{id}','TagController@show');
+Route::post('/tag/{id}', 'TagController@alter');

@@ -12,6 +12,11 @@ use DB;
 
 class MessageController extends Controller
 {
+    public function __construct()
+    {
+        $this->middleware('auth');
+    }
+
     /**
      * Display a listing of the resource.
      *
@@ -19,7 +24,10 @@ class MessageController extends Controller
      */
     public function index()
     {
-        $userid = Auth::user()->id;
+        $user = Auth::user();
+        $userid = $user->id;
+        $user->newmsgs = 0;
+        $user->save();
         $imsgs = DB::table("messages")->where('to_user_id', $userid)->where('belong_to', true)->join('users', 'users.id', '=', 'messages.from_user_id')->select("messages.*", "users.name")->get();
         $omsgs = DB::table("messages")->where('from_user_id', $userid)->where('belong_to', false)->join('users', 'users.id', '=', 'messages.to_user_id')->select("messages.*", "users.name")->get();
         $msgs = Message::where('to_user_id', $userid)->where('belong_to', true)->get();

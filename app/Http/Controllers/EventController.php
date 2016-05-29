@@ -82,17 +82,21 @@ class EventController extends Controller
         $tags = DB::table('event_tag')->where('event_id', $event->event_id)->lists('tag_name');
         $userid = Auth::user()->id;
         $auser = User::find($event->event_user_id);
-        $userlist = $event->users()->get();
         if ($event->event_user_id == $userid){
+            $userlist = DB::table('user_event')->where('event_id', $id)->join('users', 'user_event.user_id', '=', 'users.id')->select('users.*','user_event.message')->get();
             $isadmin = true;
             $isin = false;
             $isok = true;
         }
         else{
+            $userlist = $event->users()->get();
             $isadmin = false; $isok = true; $isin = false;
             foreach ($userlist as $user)
                 if ($user->id == $userid) {$isin = true; break;}
             if ($event->event_total == 0) $isok = false;
+            date_default_timezone_set("Asia/Shanghai");
+            $dat = date('Y-m-d H:i:s');
+            if (strcmp($dat,$event->event_opentill)>=0) $isok = false;
         }
         return view('event.show',['event' => $event, 'isadmin' => $isadmin, 'isin' => $isin, 'isok' => $isok, 'users' => $userlist, 'tags' => $tags, 'user' => $auser]);
     }
@@ -160,8 +164,11 @@ class EventController extends Controller
     public function signup(Request $request, $id){
         $userid=Auth::user()->id;
         $msg=$request->input("message");
-        DB::transaction(function () use($userid, $id, $msg){
-            $event=Event::find($id);
+        date_default_timezone_set("Asia/Shanghai");
+        $dat = date('Y-m-d H:i:s');
+        $event=Event::find($id);
+        if (strcmp($dat,$event->event_opentill)>=0) return redirect()->action('EventController@show',[$id]);
+        DB::transaction(function () use($userid, $id, $msg, $dat, $event){
             if($event->event_total == 0) return;
             $event->event_total--;
             $event->save();

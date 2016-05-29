@@ -31,7 +31,7 @@
                     <h4 class="page-header">已参与的用户</h4>
                     @if ($isadmin == true)
                     <table class="table table-striped table-bordered table-hover">
-                        <tr><td>Id</td><td>昵称</td><td>真实姓名</td><td>手机号码</td><td>电子邮箱地址</td></tr>
+                        <tr><td>Id</td><td>昵称</td><td>真实姓名</td><td>手机号码</td><td>电子邮箱地址</td><td>备注</td></tr>
                         @foreach ($users as $user)
                             <tr>
                                 <td>{{ $user->id }}</td>
@@ -39,6 +39,7 @@
                                 <td>{{ $user->truename }}</td>
                                 <td>{{ $user->phone }}</td>
                                 <td>{{ $user->email }}</td>
+                                <td>{{ $user->message }}</td>
                             </tr>
                         @endforeach
                     </table>

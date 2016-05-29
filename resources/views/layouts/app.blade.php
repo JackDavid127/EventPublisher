@@ -48,7 +48,7 @@
                 <!-- Left Side Of Navbar -->
                 <ul class="nav navbar-nav">
                     <li><a href="{{ url('/event') }}">活动</a></li>
-                    <li><a href="{{ url('/home') }}">管理</a></li>
+                    <!--<li><a href="{{ url('/home') }}">管理</a></li>-->
                 </ul>
 
                 <!-- Right Side Of Navbar -->
@@ -60,13 +60,27 @@
                     @else
                         <li class="dropdown">
                             <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">
-                                {{ Auth::user()->name }} <span class="caret"></span>
+                                {{ Auth::user()->name }}
+                                @if (Auth::user()->newreqs>0||Auth::user()->newmsgs>0)
+                                <span class="badge">{{ Auth::user()->newreqs + Auth::user()->newmsgs/2 }}</span>
+                                @endif
+                                <span class="caret"></span>
                             </a>
 
                             <ul class="dropdown-menu" role="menu">
                                 <li><a href="/user/{{ Auth::user()->id }}"><i class="fa fa-btn fa-user"></i>个人资料</a></li>
-                                <li><a href="/user"><i class="fa fa-btn fa-users"></i>好友</a></li>
-                                <li><a href="/message"><i class="fa fa-btn fa-envelope"></i>消息</a></li>
+                                <li><a href="/user"><i class="fa fa-btn fa-users"></i>
+                                    好友
+                                    @if (Auth::user()->newreqs>0)
+                                    <span class="badge">{{ Auth::user()->newreqs }}</span>
+                                    @endif
+                                </a></li>
+                                <li><a href="/message"><i class="fa fa-btn fa-envelope"></i>
+                                    消息
+                                    @if (Auth::user()->newmsgs>0)
+                                    <span class="badge">{{ Auth::user()->newmsgs/2 }}</span>
+                                    @endif
+                                </a></li>
                                 <li role="separator" class="divider"></li>
                                 <li><a href="{{ url('/logout') }}"><i class="fa fa-btn fa-sign-out"></i>注销</a></li>
                             </ul>
